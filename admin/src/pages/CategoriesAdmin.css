@@ -1,0 +1,96 @@
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 12px;
+}
+
+.cat-admin-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cc);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s;
+}
+
+.cat-admin-card:hover { background: rgba(255,255,255,0.03); }
+
+.cac-left { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
+
+.cac-icon {
+  font-size: 1.8rem;
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.cac-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 2px; }
+
+.cac-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  margin-bottom: 4px;
+}
+
+.cac-meta { display: flex; align-items: center; gap: 8px; }
+.cac-meta span:first-child { font-size: 0.72rem; color: var(--text-muted); }
+
+.cac-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* Category form modal */
+.cat-form-modal { max-width: 480px; width: 90%; }
+
+.icon-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.icon-preset {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.icon-preset:hover { background: var(--bg-card); border-color: var(--border-2); }
+.icon-preset.selected { border-color: var(--accent); background: rgba(124,58,237,0.12); }
+
+.form-row { display: flex; gap: 12px; }
+
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  max-width: 380px; width: 90%;
+}
+
+.modal-card h3 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 16px; }
+.modal-card p { color: var(--text-2); font-size: 0.875rem; }
+
+@media (max-width: 600px) {
+  .cat-grid { grid-template-columns: 1fr; }
+  .cat-admin-card { flex-direction: column; align-items: flex-start; }
+}
