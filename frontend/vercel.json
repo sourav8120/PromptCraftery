@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build",
+  "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "outputDirectory": "frontend/build",
+  "outputDirectory": "build",
   "env": {
     "REACT_APP_API_URL": "@react_app_api_url",
     "REACT_APP_RAZORPAY_KEY_ID": "@react_app_razorpay_key_id",
