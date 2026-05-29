@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "experimentalServices": [
+    {
+      "name": "frontend",
+      "command": "cd frontend && npm install && npm run build",
+      "port": 3000,
+      "region": "iad1"
+    },
+    {
+      "name": "admin",
+      "command": "cd admin && npm install && npm run build",
+      "port": 3001,
+      "region": "iad1"
+    },
+    {
+      "name": "backend",
+      "command": "cd backend && npm install",
+      "port": 5001,
+      "region": "iad1"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://localhost:5001/api/$1"
+    },
+    {
+      "source": "/((?!admin).*)",
+      "destination": "http://localhost:3000/$1"
+    },
+    {
+      "source": "/admin/(.*)",
+      "destination": "http://localhost:3001/admin/$1"
+    }
+  ]
+}
