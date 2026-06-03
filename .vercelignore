@@ -1,0 +1,16 @@
+# Vercel Build Ignore File
+# Ignore everything except what each service needs
+
+# Ignore all directories except the service being deployed
+/backend
+/admin
+/app
+/models
+/lib
+/public
+/hooks
+
+# Keep only necessary root files
+!vercel.json
+!package.json
+!.gitignore

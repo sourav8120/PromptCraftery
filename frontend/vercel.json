@@ -1,12 +1,27 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm install && npm run build",
   "installCommand": "npm install",
   "outputDirectory": "build",
+  "framework": "react",
+  "nodeVersion": "18.x",
   "env": {
     "REACT_APP_API_URL": "@react_app_api_url",
     "REACT_APP_RAZORPAY_KEY_ID": "@react_app_razorpay_key_id",
     "NEXT_PUBLIC_RAZORPAY_KEY_ID": "@react_app_razorpay_key_id",
     "REACT_APP_GOOGLE_CLIENT_ID": "@react_app_google_client_id"
-  }
+  },
+  "routes": [
+    {
+      "src": "^/static/(.*)",
+      "dest": "/static/$1",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "^/(?!static).*",
+      "dest": "/index.html"
+    }
+  ]
 }
