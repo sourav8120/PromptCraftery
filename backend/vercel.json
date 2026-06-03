@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "buildCommand": "npm install",
+  "installCommand": "npm install",
+  "env": {
+    "MONGODB_URI": "@mongodb_uri",
+    "JWT_SECRET": "@jwt_secret",
+    "JWT_EXPIRE": "7d",
+    "RAZORPAY_KEY_ID": "@razorpay_key_id",
+    "RAZORPAY_KEY_SECRET": "@razorpay_key_secret",
+    "FRONTEND_URL": "@frontend_url",
+    "ADMIN_URL": "@admin_url",
+    "NODE_ENV": "production"
+  }
+}
