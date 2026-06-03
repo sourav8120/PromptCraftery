@@ -2,6 +2,8 @@
   "version": 2,
   "buildCommand": "npm install",
   "installCommand": "npm install",
+  "framework": "express",
+  "nodeVersion": "18.x",
   "env": {
     "MONGODB_URI": "@mongodb_uri",
     "JWT_SECRET": "@jwt_secret",
@@ -11,5 +13,10 @@
     "FRONTEND_URL": "@frontend_url",
     "ADMIN_URL": "@admin_url",
     "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
   }
 }

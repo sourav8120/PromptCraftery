@@ -1,12 +1,19 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
+  "buildCommand": "npm install && npm run build",
   "installCommand": "npm install",
   "outputDirectory": "build",
+  "framework": "react",
+  "nodeVersion": "18.x",
   "env": {
-    "REACT_APP_API_URL": "@react_app_api_url",
-    "PORT": "3001"
-  }
+    "REACT_APP_API_URL": "@react_app_api_url"
+  },
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "/index.html"
+    }
+  ]
 }
 {
     "experimentalServices": {
