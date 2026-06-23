@@ -3,7 +3,6 @@
   "buildCommand": "npm install",
   "installCommand": "npm install",
   "framework": "express",
-  "nodeVersion": "18.x",
   "env": {
     "MONGODB_URI": "@mongodb_uri",
     "JWT_SECRET": "@jwt_secret",
