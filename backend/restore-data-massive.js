@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const slugify = require('slugify');
+const dns = require('dns');
+
+// Configure DNS to use Google's public DNS servers (fixes MongoDB SRV lookup issues)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 dotenv.config();
 
 const Category = require('./models/Category');

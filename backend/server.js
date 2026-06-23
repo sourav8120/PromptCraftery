@@ -3,8 +3,21 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit');
+const dns = require('dns');
 
+// Configure DNS to use Google's public DNS servers (fixes MongoDB SRV lookup issues)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+console.log('🔧 DNS Configured: Using Google DNS (8.8.8.8, 8.8.4.4)');
+
+// Load environment variables from .env file
 dotenv.config();
+
+// Debug: Check if MONGODB_URI is loaded
+console.log('🔍 Environment Check:');
+console.log('   - MONGODB_URI:', process.env.MONGODB_URI ? '✅ Loaded' : '❌ NOT FOUND');
+console.log('   - PORT:', process.env.PORT || 5001);
+console.log('   - NODE_ENV:', process.env.NODE_ENV || 'development');
+console.log('');
 
 const app = express();
 
@@ -71,15 +84,40 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    const PORT = process.env.PORT || 5001;
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+const connectDB = async () => {
+  try {
+    console.log('🔗 Connecting to MongoDB...');
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+      retryWrites: true,
     });
-  })
-  .catch(err => {
-    console.error('❌ MongoDB connection error:', err);
-    process.exit(1);
-  });
+    console.log('✅ MongoDB connected successfully!');
+    console.log('   - Database:', mongoose.connection.db.databaseName);
+    return true;
+  } catch (err) {
+    console.error('❌ MongoDB connection error (will retry):');
+    console.error('   - Code:', err.code);
+    console.error('   - Message:', err.message);
+    return false;
+  }
+};
+
+// Start server first, connect to MongoDB in background
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, async () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  
+  // Try to connect to MongoDB
+  let connected = false;
+  for (let i = 0; i < 5; i++) {
+    connected = await connectDB();
+    if (connected) break;
+    console.log(`⏳ Retrying in 3 seconds... (Attempt ${i + 1}/5)`);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+  
+  if (!connected) {
+    console.warn('⚠️  Database connection failed. Running in degraded mode.');
+  }
+});
