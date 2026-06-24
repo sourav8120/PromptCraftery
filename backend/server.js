@@ -47,6 +47,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/api/debug', (req, res) => {
+    res.json({
+      env: process.env.NODE_ENV,
+      mongodbUri: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+      jwtSecret: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+      mongooseState: mongoose.connection.readyState
+    });
+  });
+}
+
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
