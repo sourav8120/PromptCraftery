@@ -3,22 +3,13 @@
   "buildCommand": "npm install && npm run build",
   "installCommand": "npm install",
   "outputDirectory": "build",
+  "env": {
+    "REACT_APP_API_URL": "https://prompt-craftery-e2pe.vercel.app/api"
+  },
   "rewrites": [
     {
       "source": "/:path*",
       "destination": "/index.html"
     }
   ]
-}
-{
-    "experimentalServices": {
-        "frontend": {
-            "routePrefix": "/",
-            "framework": "nextjs"
-        },
-        "backend": {
-            "root": "backend",
-            "routePrefix": "/_/backend"
-        }
-    }
 }
