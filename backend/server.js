@@ -116,9 +116,12 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// For local development
+// For Vercel: export the app for serverless functions
+module.exports = app;
+
+// For local development: listen on port
 const PORT = process.env.PORT || 5001;
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, async () => {
     console.log(`🚀 Server running on port ${PORT}`);
     try {
@@ -129,6 +132,3 @@ if (process.env.NODE_ENV !== 'production') {
     }
   });
 }
-
-// Export for Vercel serverless functions
-module.exports = app;
