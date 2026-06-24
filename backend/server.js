@@ -64,15 +64,22 @@ const connectDB = async () => {
   }
   
   try {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI environment variable not set');
+    }
+    
     mongooseConnection = await mongoose.connect(process.env.MONGODB_URI, {
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       retryWrites: true,
       maxPoolSize: 1,
     });
+    
+    console.log('✅ MongoDB connected to:', mongoose.connection.name);
     return mongooseConnection;
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
+    console.error('MONGODB_URI set:', !!process.env.MONGODB_URI);
     throw err;
   }
 };
@@ -83,7 +90,8 @@ app.use(async (req, res, next) => {
     try {
       await connectDB();
     } catch (err) {
-      return res.status(500).json({ error: 'Database connection failed' });
+      console.error('DB connection failed in middleware:', err.message);
+      return res.status(503).json({ error: 'Database temporarily unavailable' });
     }
   }
   next();
