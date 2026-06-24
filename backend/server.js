@@ -11,6 +11,13 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 // Load environment variables from .env file
 dotenv.config();
 
+console.log('=== SERVER STARTUP ===');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+console.log('MONGODB_URI first 50 chars:', process.env.MONGODB_URI?.substring(0, 50) || 'NOT SET');
+console.log('=======================');
+
 const app = express();
 
 // Rate limiting
