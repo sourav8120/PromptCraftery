@@ -6,7 +6,6 @@ import { useUser } from '../context/UserContext';
 import { fetchPrompt, fetchPrompts, incrementCopy, likePrompt } from '../services/api';
 import PromptCard from '../components/PromptCard';
 import SubscriptionModal from '../components/SubscriptionModal';
-import SubscriptionInfo from '../components/SubscriptionInfo';
 import './PromptDetailPage.css';
 
 const DIFFICULTY_COLORS = { beginner: '#10b981', intermediate: '#f59e0b', advanced: '#ef4444' };
@@ -17,9 +16,7 @@ export default function PromptDetailPage() {
   const { user, incrementPromptUsage } = useUser();
   const [copied, setCopied] = useState(false);
   const [likes, setLikes] = useState(null);
-  const [userLiked, setUserLiked] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  const [isCheckingLimit, setIsCheckingLimit] = useState(false);
 
   const { data: prompt, isLoading, isError } = useQuery({
     queryKey: ['prompt', slug],
@@ -40,16 +37,15 @@ export default function PromptDetailPage() {
       return;
     }
 
-    setIsCheckingLimit(true);
     // Check if user has prompts remaining
-    const result = await incrementPromptUsage(prompt._id);
-    setIsCheckingLimit(false);
-    
-    if (!result.success) {
-      toast.error(result.error || 'You\'ve used all your allowed prompts!');
-      // Immediately show subscription modal
-      setTimeout(() => setShowSubscriptionModal(true), 100);
-      return;
+    if (!user.subscription || user.subscription.plan === 'free') {
+      const result = await incrementPromptUsage();
+      
+      if (!result.success) {
+        toast.error('You\'ve used all your free prompts!');
+        setShowSubscriptionModal(true);
+        return;
+      }
     }
 
     try {
@@ -73,12 +69,8 @@ export default function PromptDetailPage() {
     try {
       const data = await likePrompt(prompt._id);
       setLikes(data.likes);
-      setUserLiked(data.liked);
-      toast.success(data.message || 'Updated!');
-    } catch (error) {
-      const msg = error.response?.data?.error || 'Error updating like';
-      toast.error(msg);
-    }
+      toast.success('Liked!');
+    } catch {}
   };
 
   if (isLoading) return (
@@ -112,12 +104,6 @@ export default function PromptDetailPage() {
           <span>›</span>
           <span>{prompt.title}</span>
         </nav>
-
-        {prompt.resultImage && (
-          <div className="detail-result-image">
-            <img src={prompt.resultImage} alt={prompt.title} />
-          </div>
-        )}
 
         <div className="detail-layout">
           {/* Main */}
@@ -175,8 +161,8 @@ export default function PromptDetailPage() {
               <button className="btn btn-primary copy-action" onClick={handleCopy}>
                 {copied ? '✓ Copied!' : '⧉ Copy to Clipboard'}
               </button>
-              <button className={`btn btn-outline like-action ${userLiked ? 'liked' : ''}`} onClick={handleLike}>
-                {userLiked ? '❤' : '♥'} Like ({currentLikes})
+              <button className="btn btn-outline like-action" onClick={handleLike}>
+                ♥ Like ({currentLikes})
               </button>
             </div>
 
@@ -186,16 +172,16 @@ export default function PromptDetailPage() {
                 <div className="usage-bar">
                   <div className="usage-label">
                     <span>📊 Free Prompts Used</span>
-                    <span className="usage-count">{user.promptsUsed} / {user.subscription?.promptsLimit || 5}</span>
+                    <span className="usage-count">{user.promptsUsed} / 5</span>
                   </div>
                   <div className="progress-bar">
                     <div 
                       className="progress-fill" 
-                      style={{ width: `${(user.promptsUsed / (user.subscription?.promptsLimit || 5)) * 100}%` }}
+                      style={{ width: `${(user.promptsUsed / 5) * 100}%` }}
                     />
                   </div>
                 </div>
-                {user.promptsUsed >= (user.subscription?.promptsLimit || 5) && (
+                {user.promptsUsed >= 5 && (
                   <div className="upgrade-banner">
                     <span>🔒 Free prompts limit reached!</span>
                     <button 
@@ -206,7 +192,7 @@ export default function PromptDetailPage() {
                     </button>
                   </div>
                 )}
-                {user.promptsUsed === (user.subscription?.promptsLimit || 5) - 1 && (
+                {user.promptsUsed === 4 && (
                   <div className="almost-full">
                     <span>⚠️ Only 1 free prompt remaining. Upgrade soon!</span>
                   </div>
@@ -217,8 +203,6 @@ export default function PromptDetailPage() {
 
           {/* Sidebar */}
           <aside className="detail-sidebar">
-            {user && <SubscriptionInfo />}
-            
             <div className="sidebar-card">
               <h3>How to Use</h3>
               <ol className="how-to-list">

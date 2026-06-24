@@ -8,7 +8,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, getPlanDetails, getRemainingPrompts } = useUser();
+  const { user, logout } = useUser();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -23,18 +23,12 @@ export default function Navbar() {
     navigate('/');
   };
 
-  const planDetails = user ? getPlanDetails(user.subscription?.plan || 'free') : null;
-  const remainingPrompts = getRemainingPrompts();
-
-  // Hide auth buttons on login/register pages
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
-
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo">
           <span className="logo-icon">⚡</span>
-          <span className="logo-text">Prompt<span className="logo-accent">Craftery</span></span>
+          <span className="logo-text">Prompt<span className="logo-accent">Vault</span></span>
         </Link>
 
         <div className={`navbar-links ${menuOpen ? 'open' : ''}`}>
@@ -46,22 +40,15 @@ export default function Navbar() {
         <div className="navbar-actions">
           {user ? (
             <div className="user-menu">
-              <div className="user-info-section">
-                <span className="user-name">👤 {user.name}</span>
-                {planDetails && (
-                  <div className="subscription-info">
-                    <span className="plan-badge" title={planDetails.name}>
-                      {planDetails.badge}
-                    </span>
-                    <span className="prompts-remaining">
-                      📊 {remainingPrompts}/{planDetails.prompts} Prompts
-                    </span>
-                  </div>
+              <span className="user-info">
+                👤 {user.name}
+                {user.subscription?.plan !== 'free' && (
+                  <span className="subscription-badge">{user.subscription.plan}</span>
                 )}
-              </div>
+              </span>
               <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
             </div>
-          ) : !isAuthPage && (
+          ) : (
             <>
               <Link to="/login" className="btn btn-outline">Login</Link>
               <Link to="/register" className="btn btn-primary">Sign Up</Link>

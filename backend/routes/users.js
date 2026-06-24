@@ -34,7 +34,7 @@ router.post('/register', async (req, res) => {
         email: user.email,
         subscription: user.subscription,
         promptsUsed: user.promptsUsed,
-        promptsLimit: user.subscription.promptsLimit
+        promptsLimit: user.promptsLimit
       }
     });
   } catch (error) {
@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
         email: user.email,
         subscription: user.subscription,
         promptsUsed: user.promptsUsed,
-        promptsLimit: user.subscription.promptsLimit
+        promptsLimit: user.promptsLimit
       }
     });
   } catch (error) {
@@ -102,7 +102,7 @@ router.get('/me', async (req, res) => {
         email: user.email,
         subscription: user.subscription,
         promptsUsed: user.promptsUsed,
-        promptsLimit: user.subscription.promptsLimit
+        promptsLimit: user.promptsLimit
       }
     });
   } catch (error) {
@@ -114,14 +114,9 @@ router.get('/me', async (req, res) => {
 router.post('/increment-usage', async (req, res) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    const { promptId } = req.body;
 
     if (!token) {
       return res.status(401).json({ error: 'No token provided' });
-    }
-
-    if (!promptId) {
-      return res.status(400).json({ error: 'Prompt ID is required' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -131,69 +126,23 @@ router.post('/increment-usage', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const limit = user.subscription?.promptsLimit || 5;
-    if (!user.subscription) {
-      user.subscription = { plan: 'free', status: 'active', promptsLimit: limit };
-    }
-
-    console.log(`\n📋 [USAGE CHECK] User: ${user.email}`);
-    console.log(`   Limit: ${limit} | Used: ${user.promptsUsed} | Remaining: ${limit - user.promptsUsed}`);
-    console.log(`   Copied Count: ${user.copiedPrompts?.length || 0}`);
-    console.log(`   PromptID: ${promptId}`);
-
-    if (!user.canAccessMorePrompts(promptId)) {
-      console.log(`   ❌ BLOCKED: Cannot access more prompts`);
+    if (!user.canAccessMorePrompts()) {
       return res.status(403).json({ 
-        error: `You have used all ${limit} prompts! Please upgrade to continue.`,
+        error: 'You have used all 5 free prompts! Please upgrade to continue.',
         canAccess: false,
         promptsUsed: user.promptsUsed,
-        promptsLimit: limit,
-        remainingPrompts: 0
+        promptsLimit: user.promptsLimit,
+        freeLimit: 5
       });
     }
 
-    const alreadyCopied = user.hasCopiedPrompt(promptId);
-    console.log(`   Already copied: ${alreadyCopied}`);
-    // If already copied, allow without counting
-    if (alreadyCopied) {
-      console.log(`   ✓ ALLOWED: Recopying (no count)`);
-      return res.json({
-        canAccess: true,
-        promptsUsed: user.promptsUsed,
-        promptsLimit: limit,
-        remainingPrompts: limit - user.promptsUsed,
-        alreadyCopied: true,
-        countIncremented: false
-      });
-    }
-
-    // Check if limit reached before recording new copy
-    if (user.promptsUsed >= limit) {
-      console.log(`   ❌ BLOCKED: Limit reached (${user.promptsUsed} >= ${limit})`);
-      return res.status(403).json({ 
-        error: `You have used all ${limit} prompts! Please upgrade to continue.`,
-        canAccess: false,
-        promptsUsed: user.promptsUsed,
-        promptsLimit: limit,
-        remainingPrompts: 0
-      });
-    }
-
-    let countIncremented = false;
-    if (!alreadyCopied) {
-      console.log(`   📝 Recording copy...`);
-      await user.recordPromptCopy(promptId);
-      console.log(`   ✓ ALLOWED: New copy recorded (${user.promptsUsed}/${limit})`);
-      countIncremented = true;
-    }
+    await user.incrementPromptUsage();
 
     res.json({
       canAccess: true,
       promptsUsed: user.promptsUsed,
-      promptsLimit: limit,
-      remainingPrompts: limit - user.promptsUsed,
-      alreadyCopied,
-      countIncremented
+      promptsLimit: user.promptsLimit,
+      remainingPrompts: user.promptsLimit - user.promptsUsed
     });
   } catch (error) {
     res.status(401).json({ error: error.message });

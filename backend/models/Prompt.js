@@ -61,17 +61,9 @@ const promptSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  likedBy: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }],
   author: {
     type: String,
-    default: 'PromptCraftery Team'
-  },
-  resultImage: {
-    type: String,
-    default: null
+    default: 'PromptVault Team'
   }
 }, {
   timestamps: true

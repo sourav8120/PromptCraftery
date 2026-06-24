@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import toast from 'react-hot-toast';
 import './AuthPages.css';
 
 function RegisterPage() {
@@ -11,49 +10,8 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { register, googleLogin } = useUser();
+  const { register } = useUser();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Wait for Google SDK to load
-    const loadGoogleButton = () => {
-      if (window.google?.accounts?.id) {
-        window.google.accounts.id.initialize({
-          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
-          callback: handleGoogleResponse
-        });
-        
-        const btnElement = document.getElementById('google-signup-btn');
-        if (btnElement) {
-          window.google.accounts.id.renderButton(btnElement, {
-            theme: 'outline',
-            size: 'large',
-            width: '400'
-          });
-        }
-      } else {
-        // SDK not loaded yet, retry in 100ms
-        setTimeout(loadGoogleButton, 100);
-      }
-    };
-    
-    loadGoogleButton();
-  }, []);
-
-  const handleGoogleResponse = async (response) => {
-    try {
-      setLoading(true);
-      setError('');
-      await googleLogin(response.credential);
-      toast.success('Account created with Google!');
-      navigate('/');
-    } catch (err) {
-      setError(err);
-      toast.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,11 +31,9 @@ function RegisterPage() {
 
     try {
       await register(name, email, password);
-      toast.success('Account created successfully!');
       navigate('/');
     } catch (err) {
       setError(err);
-      toast.error(err);
     } finally {
       setLoading(false);
     }
@@ -86,7 +42,7 @@ function RegisterPage() {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h1>Join PromptCraftery 🎯</h1>
+        <h1>Join PromptVault 🎯</h1>
         <p className="auth-subtitle">Get access to thousands of AI prompts</p>
 
         {error && <div className="error-message">{error}</div>}
@@ -144,12 +100,6 @@ function RegisterPage() {
             {loading ? 'Creating account...' : 'Sign Up'}
           </button>
         </form>
-
-        <div className="divider">
-          <span>OR</span>
-        </div>
-
-        <div id="google-signup-btn" className="google-btn-container"></div>
 
         <p className="auth-link">
           Already have an account? <Link to="/login">Login here</Link>

@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="login-card">
         <div className="login-logo">
           <span>⚡</span>
-          <h1>Prompt<span>Craftery</span></h1>
+          <h1>Prompt<span>Vault</span></h1>
         </div>
         <p className="login-subtitle">Admin Panel</p>
 
@@ -67,7 +67,7 @@ export default function LoginPage() {
 
         <div className="login-hint">
           <p>Default credentials after seeding:</p>
-          <code>admin@promptcraftery.com / Admin@123456</code>
+          <code>admin@promptvault.com / Admin@123456</code>
         </div>
       </div>
     </div>

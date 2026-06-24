@@ -81,23 +81,9 @@ export function UserProvider({ children }) {
     setUser(null);
   };
 
-  const googleLogin = async (googleToken) => {
+  const incrementPromptUsage = async () => {
     try {
-      const res = await axios.post(`${API_BASE}/google-auth/verify-google-token`, {
-        token: googleToken
-      });
-      localStorage.setItem('pv_token', res.data.token);
-      setToken(res.data.token);
-      setUser(res.data.user);
-      return res.data;
-    } catch (error) {
-      throw error.response?.data?.error || error.message;
-    }
-  };
-
-  const incrementPromptUsage = async (promptId) => {
-    try {
-      const res = await api.post('/users/increment-usage', { promptId });
+      const res = await api.post('/users/increment-usage');
       if (res.data.canAccess) {
         setUser(prev => ({
           ...prev,
@@ -139,7 +125,7 @@ export function UserProvider({ children }) {
           order_id: orderId,
           amount: orderRes.data.amount * 100, // Amount in paise
           currency: 'INR',
-          name: 'PromptCraftery',
+          name: 'PromptVault',
           description: `${orderRes.data.planName} Plan - ₹${orderRes.data.amount}`,
           handler: async (response) => {
             try {
@@ -152,9 +138,12 @@ export function UserProvider({ children }) {
               });
 
               if (verifyRes.data.success) {
-                // Refresh the full user profile after successful subscription
-                const currentUser = await api.get('/users/me');
-                setUser(currentUser.data.user);
+                setUser(prev => ({
+                  ...prev,
+                  subscription: verifyRes.data.subscription,
+                  promptsLimit: verifyRes.data.promptsLimit,
+                  promptsUsed: 0
+                }));
                 resolve({ success: true, data: verifyRes.data });
               }
             } catch (error) {
@@ -222,64 +211,18 @@ export function UserProvider({ children }) {
     }
   };
 
-  // Helper function to get plan details
-  const getPlanDetails = (planName) => {
-    const plans = {
-      free: {
-        name: 'Free',
-        prompts: 5,
-        price: 0,
-        duration: 'Forever',
-        badge: '✨ Free Tier'
-      },
-      starter: {
-        name: 'Starter',
-        prompts: 25,
-        price: 1,
-        duration: '1 month',
-        badge: '🔥 Starter Plan'
-      },
-      pro: {
-        name: 'Pro',
-        prompts: 100,
-        price: 299,
-        duration: '6 months',
-        badge: '⚡ Pro Plan'
-      },
-      premium: {
-        name: 'Premium',
-        prompts: 400,
-        price: 799,
-        duration: '1 year',
-        badge: '💎 Premium Plan'
-      }
-    };
-    return plans[planName] || plans.free;
-  };
-
-  // Helper function to get remaining prompts
-  const getRemainingPrompts = () => {
-    if (!user || !user.subscription) return 5;
-    const planPrompts = user.subscription.promptsLimit || 5;
-    const remaining = planPrompts - (user.promptsUsed || 0);
-    return Math.max(0, remaining);
-  };
-
   return (
     <UserContext.Provider value={{
       user,
       loading,
       token,
       login,
-      googleLogin,
       register,
       logout,
       incrementPromptUsage,
       purchaseSubscription,
       cancelSubscription,
       getSubscriptionStatus,
-      getPlanDetails,
-      getRemainingPrompts,
       api
     }}>
       {children}

@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const dns = require('dns');
+
+// Configure DNS to use Google's public DNS servers (fixes MongoDB SRV lookup issues)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 dotenv.config();
 
 const Category = require('./models/Category');
@@ -7,19 +12,18 @@ const Prompt = require('./models/Prompt');
 const Admin = require('./models/Admin');
 
 const categories = [
-  { name: 'Instagram Trending', icon: '📸', color: '#e1306c', description: 'Trending prompts and ideas for Instagram content creation', order: 1 },
-  { name: 'Study & Learning', icon: '📚', color: '#3b82f6', description: 'Prompts for students, research, and academic learning', order: 2 },
-  { name: 'Software Development', icon: '💻', color: '#8b5cf6', description: 'Code generation, debugging, architecture, and tech prompts', order: 3 },
-  { name: 'Physical Fitness', icon: '💪', color: '#f59e0b', description: 'Workout plans, exercise routines, and fitness guidance', order: 4 },
-  { name: 'Health & Wellness', icon: '🏥', color: '#10b981', description: 'Health advice, nutrition, mental wellness prompts', order: 5 },
-  { name: 'Business & Marketing', icon: '📈', color: '#ef4444', description: 'Marketing copy, business strategy, and entrepreneurship', order: 6 },
-  { name: 'Creative Writing', icon: '✍️', color: '#ec4899', description: 'Stories, poetry, scripts, and creative content', order: 7 },
-  { name: 'Productivity', icon: '⚡', color: '#06b6d4', description: 'Task management, time optimization, goal setting', order: 8 },
-  { name: 'Language Learning', icon: '🌍', color: '#f97316', description: 'Language practice, translation, grammar prompts', order: 9 },
-  { name: 'Art & Design', icon: '🎨', color: '#a855f7', description: 'Image generation, design feedback, creative direction', order: 10 },
-  { name: 'Finance & Investing', icon: '💰', color: '#84cc16', description: 'Financial planning, investment analysis, budgeting', order: 11 },
-  { name: 'Cooking & Recipes', icon: '🍳', color: '#fb923c', description: 'Recipe creation, meal planning, cooking guidance', order: 12 },
-  { name: 'Career & Resume', icon: '🎯', color: '#64748b', description: 'Resume writing, interview prep, career guidance', order: 13 }
+  { name: 'Study & Learning', icon: '📚', color: '#3b82f6', description: 'Prompts for students, research, and academic learning', order: 1 },
+  { name: 'Software Development', icon: '💻', color: '#8b5cf6', description: 'Code generation, debugging, architecture, and tech prompts', order: 2 },
+  { name: 'Physical Fitness', icon: '💪', color: '#f59e0b', description: 'Workout plans, exercise routines, and fitness guidance', order: 3 },
+  { name: 'Health & Wellness', icon: '🏥', color: '#10b981', description: 'Health advice, nutrition, mental wellness prompts', order: 4 },
+  { name: 'Business & Marketing', icon: '📈', color: '#ef4444', description: 'Marketing copy, business strategy, and entrepreneurship', order: 5 },
+  { name: 'Creative Writing', icon: '✍️', color: '#ec4899', description: 'Stories, poetry, scripts, and creative content', order: 6 },
+  { name: 'Productivity', icon: '⚡', color: '#06b6d4', description: 'Task management, time optimization, goal setting', order: 7 },
+  { name: 'Language Learning', icon: '🌍', color: '#f97316', description: 'Language practice, translation, grammar prompts', order: 8 },
+  { name: 'Art & Design', icon: '🎨', color: '#a855f7', description: 'Image generation, design feedback, creative direction', order: 9 },
+  { name: 'Finance & Investing', icon: '💰', color: '#84cc16', description: 'Financial planning, investment analysis, budgeting', order: 10 },
+  { name: 'Cooking & Recipes', icon: '🍳', color: '#fb923c', description: 'Recipe creation, meal planning, cooking guidance', order: 11 },
+  { name: 'Career & Resume', icon: '🎯', color: '#64748b', description: 'Resume writing, interview prep, career guidance', order: 12 }
 ];
 
 const seedPrompts = (categoryMap) => [
@@ -143,36 +147,6 @@ const seedPrompts = (categoryMap) => [
     difficulty: 'beginner',
     aiModel: 'Claude'
   },
-  // Instagram Trending
-  {
-    title: 'Viral Instagram Caption Generator',
-    content: 'Create a viral-worthy Instagram caption for my post about [TOPIC/PRODUCT]. The caption should:\n1. **Hook**: Start with an attention-grabbing hook or question\n2. **Story**: Tell a brief relatable story (2-3 sentences)\n3. **Value**: Provide a clear benefit or insight\n4. **CTA**: Include a clear call-to-action\n5. **Emojis**: Use 3-5 relevant emojis strategically\n6. **Hashtags**: Suggest 10-15 high-volume hashtags\n\nTarget Audience: [DESCRIBE YOUR AUDIENCE]\nTone: [PROFESSIONAL/CASUAL/INSPIRATIONAL/FUNNY]',
-    description: 'Generate engaging captions that drive Instagram engagement',
-    category: categoryMap['Instagram Trending'],
-    tags: ['instagram', 'captions', 'social media', 'engagement'],
-    difficulty: 'beginner',
-    aiModel: 'Any',
-    isFeatured: true
-  },
-  {
-    title: 'Instagram Reel Concept Generator',
-    content: 'Generate 5 trending Instagram Reel ideas for [YOUR NICHE]. For each idea, provide:\n1. **Hook**: First 2 seconds (what makes people stop scrolling)\n2. **Main Action**: The core content/transformation\n3. **Trending Music/Audio**: Song/audio suggestion from Instagram\n4. **Text Overlay**: Key on-screen text\n5. **Call-to-Action**: What viewers should do\n6. **Best Time to Post**: When your audience is most active\n\nYour Niche: [DESCRIBE YOUR CONTENT NICHE]\nCurrent Follower Count: [NUMBER]\nTarget Result: [AWARENESS/LEAD GENERATION/SALES]',
-    description: 'Create trending Instagram Reel concepts that drive views',
-    category: categoryMap['Instagram Trending'],
-    tags: ['instagram reels', 'video content', 'trending', 'viral'],
-    difficulty: 'beginner',
-    aiModel: 'Any',
-    isFeatured: true
-  },
-  {
-    title: 'Instagram Hashtag Strategy Optimizer',
-    content: 'Create a hashtag strategy for my Instagram account targeting [NICHE].\n\nProvide:\n1. **Tier 1 (Mega Tags)**: 1M+ posts - high competition\n2. **Tier 2 (Large Tags)**: 500K-1M posts - medium competition\n3. **Tier 3 (Medium Tags)**: 100K-500K posts - good reach\n4. **Tier 4 (Micro Tags)**: 10K-100K posts - niche specific\n5. **Tier 5 (Nano Tags)**: <10K posts - highly specific\n\nFor each tier, provide 5 relevant hashtags that match my content type.\n\nMy Content Type: [PHOTOGRAPHY/LIFESTYLE/EDUCATION/FASHION/BUSINESS/OTHER]\nTarget Audience Demographics: [AGE/INTERESTS/LOCATION]',
-    description: 'Optimize your hashtag strategy for maximum Instagram reach',
-    category: categoryMap['Instagram Trending'],
-    tags: ['hashtags', 'instagram strategy', 'reach', 'growth'],
-    difficulty: 'beginner',
-    aiModel: 'Any'
-  },
   // Career & Resume
   {
     title: 'ATS-Optimized Resume Builder',
@@ -209,11 +183,11 @@ async function seed() {
     // Create super admin
     await Admin.create({
       name: 'Super Admin',
-      email: 'admin@promptcraftery.com',
+      email: 'admin@promptvault.com',
       password: 'Admin@123456',
       role: 'superadmin'
     });
-    console.log('✅ Created super admin: admin@promptcraftery.com / Admin@123456');
+    console.log('✅ Created super admin: admin@promptvault.com / Admin@123456');
 
     console.log('\n🎉 Database seeded successfully!');
     process.exit(0);

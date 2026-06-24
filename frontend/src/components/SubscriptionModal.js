@@ -15,12 +15,9 @@ export function SubscriptionModal({ isOpen, onClose, promptsUsed = 5 }) {
         {
           id: 'starter',
           name: 'Starter',
-          price: 1,
-          originalPrice: 199,
+          price: 99,
           prompts: 25,
           duration: '1 month',
-          discount: 50,
-          badge: '🔥 Save 50%',
           features: ['25 prompts per month', 'Basic support', 'Save your favorites'],
           popular: false
         },
@@ -28,11 +25,8 @@ export function SubscriptionModal({ isOpen, onClose, promptsUsed = 5 }) {
           id: 'pro',
           name: 'Pro',
           price: 299,
-          originalPrice: 999,
           prompts: 100,
           duration: '6 months',
-          discount: 70,
-          badge: '⚡ Save 70%',
           features: ['100 prompts per month', 'Priority support', 'Save 50% vs monthly', 'Early access to new prompts'],
           popular: true
         },
@@ -40,11 +34,8 @@ export function SubscriptionModal({ isOpen, onClose, promptsUsed = 5 }) {
           id: 'premium',
           name: 'Premium',
           price: 799,
-          originalPrice: 6499,
           prompts: 400,
           duration: '1 year',
-          discount: 88,
-          badge: '💎 Save 88%',
           features: ['400 prompts per month', 'VIP support', 'Save 73% vs monthly', 'Lifetime access to new prompts'],
           popular: false
         }
@@ -98,9 +89,9 @@ export function SubscriptionModal({ isOpen, onClose, promptsUsed = 5 }) {
 
         <div className="modal-header">
           <h2>🚀 Unlock More Prompts!</h2>
-          <p>You've used {promptsUsed} prompts. Choose a plan to continue exploring!</p>
+          <p>You've used your {promptsUsed} free prompts. Choose a plan to continue exploring!</p>
           <div className="free-prompts-badge">
-            <span>✨ Current usage: {promptsUsed} prompts</span>
+            <span>✨ Free Tier: {promptsUsed} prompts</span>
           </div>
         </div>
 
@@ -114,10 +105,7 @@ export function SubscriptionModal({ isOpen, onClose, promptsUsed = 5 }) {
               
               <h3>{plan.name}</h3>
               
-              <div className="discount-badge">{plan.badge}</div>
-              
               <div className="price-section">
-                <div className="original-price">₹{plan.originalPrice}</div>
                 <div className="price">
                   <span className="currency">₹</span>
                   <span className="amount">{plan.price}</span>

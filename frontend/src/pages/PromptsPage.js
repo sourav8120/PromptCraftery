@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPrompts, fetchCategories } from '../services/api';
-import { useUser } from '../context/UserContext';
 import PromptCard from '../components/PromptCard';
-import SubscriptionInfo from '../components/SubscriptionInfo';
 import './PromptsPage.css';
 
 const DIFFICULTIES = ['beginner', 'intermediate', 'advanced'];
@@ -20,7 +18,6 @@ export default function PromptsPage() {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState('-createdAt');
   const featured = searchParams.get('featured');
-  const { user } = useUser();
 
   const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: fetchCategories });
 
@@ -118,8 +115,6 @@ export default function PromptsPage() {
               ))}
             </div>
           </div>
-
-          {user && <SubscriptionInfo />}
         </aside>
 
         {/* Main Content */}

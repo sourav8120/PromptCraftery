@@ -1,7 +1,7 @@
 {
-  "name": "promptcraftery-backend",
+  "name": "promptvault-backend",
   "version": "1.0.0",
-  "description": "PromptCraftery Backend API",
+  "description": "PromptVault Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

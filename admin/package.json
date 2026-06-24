@@ -1,5 +1,5 @@
 {
-  "name": "promptcraftery-admin",
+  "name": "promptvault-admin",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
@@ -17,7 +17,7 @@
     "start": "cross-env PORT=3001 react-scripts start",
     "build": "react-scripts build"
   },
-  "proxy": "http://localhost:5001",
+  "proxy": "http://localhost:5000",
   "browserslist": {
     "production": [">0.2%", "not dead", "not op_mini all"],
     "development": ["last 1 chrome version", "last 1 firefox version"]

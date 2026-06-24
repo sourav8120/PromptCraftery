@@ -24,7 +24,7 @@ export default function DashboardLayout() {
         <div className="sidebar-top">
           <div className="sidebar-logo">
             <span className="logo-icon">⚡</span>
-            {!collapsed && <span className="logo-text">Prompt<span>Craftery</span></span>}
+            {!collapsed && <span className="logo-text">Prompt<span>Vault</span></span>}
           </div>
           <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
             {collapsed ? '»' : '«'}

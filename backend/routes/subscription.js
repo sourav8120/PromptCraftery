@@ -16,7 +16,7 @@ const razorpay = new Razorpay({
 const PLANS = {
   starter: {
     name: 'Starter',
-    price: 1, // Rs 1 (for testing)
+    price: 99, // Rs 99
     prompts: 25,
     duration: 30,
     promptsLimit: 25
@@ -44,7 +44,7 @@ router.get('/plans', (req, res) => {
       { 
         id: 'starter', 
         name: 'Starter', 
-        price: 1,
+        price: 99,
         prompts: 25,
         currency: 'INR',
         duration: '1 month',
@@ -108,7 +108,6 @@ router.post('/create-order', async (req, res) => {
         amount: plan.price * 100, // Amount in paise (1 INR = 100 paise)
         currency: 'INR',
         receipt: receipt, // Max 40 characters
-        payment_capture: 1,
         notes: {
           planId: planId,
           userId: user._id.toString(),
@@ -180,17 +179,20 @@ router.post('/verify-payment', async (req, res) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + plan.duration);
 
-    // Update user subscription properties individually
-    user.subscription.plan = planId;
-    user.subscription.status = 'active';
-    user.subscription.startDate = startDate;
-    user.subscription.endDate = endDate;
-    user.subscription.price = plan.price;
-    user.subscription.promptsLimit = plan.promptsLimit;
+    // Update user subscription
+    user.subscription = {
+      plan: planId,
+      status: 'active',
+      startDate,
+      endDate,
+      price: plan.price,
+      paymentId: razorpay_payment_id,
+      orderId: razorpay_order_id
+    };
 
-    // Reset prompts count and unique prompt history for a fresh plan cycle
+    // Reset prompts count and set new limit
     user.promptsUsed = 0;
-    user.copiedPrompts = [];
+    user.promptsLimit = plan.promptsLimit;
 
     await user.save();
 
@@ -198,16 +200,8 @@ router.post('/verify-payment', async (req, res) => {
       success: true,
       message: `Successfully subscribed to ${plan.name}`,
       subscription: user.subscription,
-      promptsLimit: user.subscription.promptsLimit,
-      totalPrompts: plan.prompts,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        subscription: user.subscription,
-        promptsUsed: user.promptsUsed,
-        promptsLimit: user.subscription.promptsLimit
-      }
+      promptsLimit: user.promptsLimit,
+      totalPrompts: plan.prompts
     });
   } catch (error) {
     console.error('Payment verification error:', error);
@@ -237,7 +231,7 @@ router.post('/cancel', async (req, res) => {
 
     user.subscription.status = 'cancelled';
     user.subscription.plan = 'free';
-    user.subscription.promptsLimit = 5;
+    user.promptsLimit = 5;
     user.promptsUsed = 0;
 
     await user.save();
@@ -273,7 +267,7 @@ router.get('/status', async (req, res) => {
       if (new Date() > user.subscription.endDate) {
         user.subscription.status = 'expired';
         user.subscription.plan = 'free';
-        user.subscription.promptsLimit = 5;
+        user.promptsLimit = 5;
         user.promptsUsed = 0;
         await user.save();
       }
@@ -282,9 +276,9 @@ router.get('/status', async (req, res) => {
     res.json({
       subscription: user.subscription,
       promptsUsed: user.promptsUsed,
-      promptsLimit: user.subscription.promptsLimit,
+      promptsLimit: user.promptsLimit,
       canAccess: user.canAccessMorePrompts(),
-      remainingPrompts: user.subscription.promptsLimit - user.promptsUsed
+      remainingPrompts: user.promptsLimit - user.promptsUsed
     });
   } catch (error) {
     res.status(401).json({ error: error.message });

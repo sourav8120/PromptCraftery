@@ -23,26 +23,6 @@
 .breadcrumb a { color: var(--text-secondary); transition: color 0.2s; }
 .breadcrumb a:hover { color: var(--accent-bright); }
 
-.detail-result-image {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.detail-result-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -195,12 +175,6 @@
 
 .copy-action, .like-action { font-size: 1rem; padding: 12px 24px; }
 
-.like-action.liked {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-  border-color: rgba(239, 68, 68, 0.5);
-}
-
 /* Sidebar */
 .detail-sidebar {
   position: sticky;
@@ -306,16 +280,12 @@
   background: rgba(168, 85, 247, 0.2);
   border-radius: 4px;
   overflow: hidden;
-  contain: layout style paint;
 }
 
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #a855f7, #7c3aed);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: width;
-  backface-visibility: hidden;
-  transform: translateZ(0);
+  transition: width 0.3s ease;
 }
 
 .upgrade-banner {

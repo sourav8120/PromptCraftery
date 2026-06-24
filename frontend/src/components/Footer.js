@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="container footer-inner bg-white ">
         <div className="footer-brand">
-          <div className="footer-logo">⚡ Prompt<span>Craftery</span></div>
+          <div className="footer-logo">⚡ Prompt<span>Vault</span></div>
           <p>Discover thousands of expert AI prompts crafted for every need — from study and code to health and creativity.</p>
         </div>
         <div className="footer-links">
@@ -29,7 +29,7 @@ export default function Footer() {
       </div>
       <div className="footer-bottom">
         <div className="container">
-          <p>© {new Date().getFullYear()} PromptCraftery. Built with ❤️</p>
+          <p>© {new Date().getFullYear()} PromptVault. Built with ❤️</p>
         </div>
       </div>
     </footer>

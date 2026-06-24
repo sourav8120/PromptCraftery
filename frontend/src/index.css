@@ -19,8 +19,7 @@
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.15);
   --font-display: 'Syne', sans-serif;
-  --font-body: 'Poppins', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'Inter', sans-serif;
   --transition: 0.2s ease;
 }
 
@@ -61,46 +60,6 @@ button {
   font-family: var(--font-body);
   border: none;
   outline: none;
-}
-
-/* Heading Styles */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-h2 {
-  font-size: 2.2rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-h4 {
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
-h5 {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-h6 {
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
 input, textarea, select {

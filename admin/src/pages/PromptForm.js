@@ -11,7 +11,7 @@ const AI_MODELS = ['Any', 'ChatGPT', 'Claude', 'Gemini', 'GPT-4', 'Llama'];
 const EMPTY = {
   title: '', content: '', description: '', category: '',
   tags: '', difficulty: 'beginner', aiModel: 'Any',
-  isActive: true, isFeatured: false, author: 'PromptCraftery Team', resultImage: null
+  isActive: true, isFeatured: false, author: 'PromptVault Team'
 };
 
 export default function PromptForm() {
@@ -22,9 +22,6 @@ export default function PromptForm() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Load categories
   const { data: categories = [] } = useQuery({
@@ -57,64 +54,13 @@ export default function PromptForm() {
               aiModel: found.aiModel || 'Any',
               isActive: found.isActive !== false,
               isFeatured: !!found.isFeatured,
-              author: found.author || 'PromptCraftery Team',
-              resultImage: found.resultImage || null
+              author: found.author || 'PromptVault Team'
             });
-            if (found.resultImage) {
-              setImagePreview(found.resultImage);
-            }
           }
         })
         .catch(() => toast.error('Failed to load prompt'));
     }
   }, [isEdit, id]);
-
-  const handleImageSelect = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
-        toast.error('Only image files are allowed (JPEG, PNG, GIF, WebP)');
-        return;
-      }
-      // Validate file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('File size must be less than 5MB');
-        return;
-      }
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const uploadImage = async () => {
-    if (!imageFile || !id) {
-      if (!id) toast.error('Please save the prompt first before uploading an image');
-      return;
-    }
-    setUploadingImage(true);
-    try {
-      const formData = new FormData();
-      formData.append('resultImage', imageFile);
-      
-      const response = await api.post(`/prompts/${id}/upload-image`, formData);
-      
-      setForm(prev => ({ ...prev, resultImage: response.data.imageUrl }));
-      setImageFile(null);
-      setImagePreview(response.data.imageUrl);
-      toast.success('Image uploaded successfully!');
-    } catch (err) {
-      console.error('Upload error:', err);
-      const errorMsg = err.response?.data?.error || err.message || 'Image upload failed';
-      toast.error(errorMsg);
-    } finally {
-      setUploadingImage(false);
-    }
-  };
 
   const set = (field) => (e) => {
     const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -235,41 +181,6 @@ export default function PromptForm() {
               <div className="form-group">
                 <label className="form-label">Author</label>
                 <input type="text" className="form-input" value={form.author} onChange={set('author')} />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Result Image <span style={{ color: 'var(--text-muted)' }}>(optional)</span></label>
-                <div className="image-upload-section">
-                  {imagePreview && (
-                    <div className="image-preview">
-                      <img src={imagePreview} alt="Preview" />
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '8px 0 0 0' }}>
-                        {imageFile ? 'New image selected' : 'Current image'}
-                      </p>
-                    </div>
-                  )}
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleImageSelect}
-                    style={{ display: 'none' }}
-                    id="image-input"
-                  />
-                  <label htmlFor="image-input" className="btn btn-outline" style={{ cursor: 'pointer', display: 'block', textAlign: 'center', marginBottom: '8px' }}>
-                    📷 Choose Image
-                  </label>
-                  {imageFile && (
-                    <button 
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={uploadImage}
-                      disabled={uploadingImage}
-                      style={{ width: '100%' }}
-                    >
-                      {uploadingImage ? 'Uploading...' : '⬆ Upload Image'}
-                    </button>
-                  )}
-                </div>
               </div>
 
               <div className="toggle-row">

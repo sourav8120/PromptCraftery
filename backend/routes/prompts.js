@@ -3,7 +3,6 @@ const router = express.Router();
 const Prompt = require('../models/Prompt');
 const Category = require('../models/Category');
 const { protect } = require('../middleware/auth');
-const upload = require('../middleware/upload');
 
 // GET all prompts (public) with search, filter, pagination
 router.get('/', async (req, res) => {
@@ -76,87 +75,13 @@ router.post('/:id/copy', async (req, res) => {
   }
 });
 
-// POST like (authenticated)
-router.post('/:id/like', protect, async (req, res) => {
+// POST like (public)
+router.post('/:id/like', async (req, res) => {
   try {
-    const userId = req.user.id;
-    const prompt = await Prompt.findById(req.params.id);
-    
-    if (!prompt) {
-      return res.status(404).json({ error: 'Prompt not found' });
-    }
-    
-    // Check if user has already liked
-    const hasLiked = prompt.likedBy.includes(userId);
-    
-    if (hasLiked) {
-      // Unlike
-      await Prompt.findByIdAndUpdate(
-        req.params.id,
-        { $inc: { likes: -1 }, $pull: { likedBy: userId } },
-        { new: true }
-      );
-      res.json({ likes: prompt.likes - 1, liked: false, message: 'Unliked' });
-    } else {
-      // Like
-      await Prompt.findByIdAndUpdate(
-        req.params.id,
-        { $inc: { likes: 1 }, $push: { likedBy: userId } },
-        { new: true }
-      );
-      res.json({ likes: prompt.likes + 1, liked: true, message: 'Liked' });
-    }
+    const prompt = await Prompt.findByIdAndUpdate(req.params.id, { $inc: { likes: 1 } }, { new: true });
+    res.json({ likes: prompt.likes });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// POST upload prompt result image (admin)
-router.post('/:id/upload-image', protect, upload.single('resultImage'), async (req, res) => {
-  try {
-    console.log('Upload request received for prompt:', req.params.id);
-    console.log('File received:', req.file);
-    
-    if (!req.file) {
-      console.error('No file in request');
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000';
-    const imageUrl = `${backendUrl}/uploads/prompts/${req.file.filename}`;
-    
-    console.log('Saving image URL:', imageUrl);
-    
-    const prompt = await Prompt.findByIdAndUpdate(
-      req.params.id,
-      { resultImage: imageUrl },
-      { new: true }
-    ).populate('category', 'name slug icon color');
-
-    if (!prompt) {
-      console.error('Prompt not found:', req.params.id);
-      return res.status(404).json({ error: 'Prompt not found' });
-    }
-
-    console.log('Image uploaded successfully for prompt:', prompt.title);
-
-    res.json({ 
-      message: 'Image uploaded successfully',
-      prompt,
-      imageUrl
-    });
-  } catch (err) {
-    console.error('Upload error:', err);
-    
-    // Delete uploaded file if there was an error
-    if (req.file) {
-      const fs = require('fs');
-      fs.unlink(req.file.path, (e) => {
-        if (e) console.error('Error deleting file:', e);
-      });
-    }
-    
-    res.status(400).json({ error: err.message || 'Image upload failed' });
   }
 });
 

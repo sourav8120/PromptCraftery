@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
   subscription: {
     plan: {
       type: String,
-      enum: ['free', 'starter', 'pro', 'premium'],
+      enum: ['free', 'monthly', 'quarterly', 'yearly'],
       default: 'free'
     },
     status: {
@@ -37,21 +37,16 @@ const userSchema = new mongoose.Schema({
     price: {
       type: Number,
       default: 0
-    },
-    promptsLimit: {
-      type: Number,
-      default: 5 // Free: 5, Starter: 25, Pro: 100, Premium: 400
     }
   },
   promptsUsed: {
     type: Number,
     default: 0
   },
-  copiedPrompts: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Prompt',
-    default: []
-  }],
+  promptsLimit: {
+    type: Number,
+    default: 5 // Free tier: 5 prompts
+  },
   freeTrialUsed: {
     type: Boolean,
     default: false
@@ -84,43 +79,19 @@ userSchema.methods.comparePassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Update prompt usage for unique prompt copies
-userSchema.methods.recordPromptCopy = async function(promptId) {
-  if (!this.copiedPrompts) {
-    this.copiedPrompts = [];
-  }
-  
-  const alreadyCopied = this.copiedPrompts.some(id => id.toString() === promptId.toString());
-  if (alreadyCopied) {
-    return false;
-  }
-
-  this.copiedPrompts.push(promptId);
+// Update prompt usage
+userSchema.methods.incrementPromptUsage = async function() {
   this.promptsUsed += 1;
   await this.save();
+};
+
+// Check if user can access more prompts
+userSchema.methods.canAccessMorePrompts = function() {
+  if (this.subscription.plan === 'free') {
+    return this.promptsUsed < this.promptsLimit;
+  }
+  // Paid subscribers have unlimited access
   return true;
-};
-
-userSchema.methods.hasCopiedPrompt = function(promptId) {
-  if (!this.copiedPrompts || this.copiedPrompts.length === 0) {
-    return false;
-  }
-  return this.copiedPrompts.some(id => id.toString() === promptId.toString());
-};
-
-// Check if user can access more prompts for a given prompt
-userSchema.methods.canAccessMorePrompts = function(promptId) {
-  const plan = this.subscription?.plan || 'free';
-  const limit = this.subscription?.promptsLimit || 5;
-  
-  // Allow copying if already copied (don't count twice)
-  const alreadyCopied = this.hasCopiedPrompt(promptId);
-  if (alreadyCopied) {
-    return true;
-  }
-
-  // Block if limit reached
-  return this.promptsUsed < limit;
 };
 
 module.exports = mongoose.model('User', userSchema);

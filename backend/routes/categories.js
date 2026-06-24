@@ -1,26 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Category = require('../models/Category');
-const Prompt = require('../models/Prompt');
 const { protect } = require('../middleware/auth');
 
 // GET all active categories (public)
 router.get('/', async (req, res) => {
   try {
     const categories = await Category.find({ isActive: true }).sort({ order: 1, name: 1 });
-    
-    // Get prompt count for each category
-    const categoriesWithCounts = await Promise.all(
-      categories.map(async (cat) => {
-        const promptCount = await Prompt.countDocuments({ category: cat._id, isActive: true });
-        return {
-          ...cat.toObject(),
-          promptCount
-        };
-      })
-    );
-    
-    res.json({ categories: categoriesWithCounts });
+    res.json({ categories });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
@@ -31,11 +18,7 @@ router.get('/:slug', async (req, res) => {
   try {
     const category = await Category.findOne({ slug: req.params.slug, isActive: true });
     if (!category) return res.status(404).json({ error: 'Category not found' });
-    
-    // Get prompt count for this category
-    const promptCount = await Prompt.countDocuments({ category: category._id, isActive: true });
-    
-    res.json({ category: { ...category.toObject(), promptCount } });
+    res.json({ category });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
