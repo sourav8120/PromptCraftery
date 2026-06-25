@@ -41,39 +41,6 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/', limiter);
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/subscription', require('./routes/subscription'));
-app.use('/api/categories', require('./routes/categories'));
-app.use('/api/prompts', require('./routes/prompts'));
-app.use('/api/admin', require('./routes/admin'));
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// Debug endpoint (only in development)
-if (process.env.NODE_ENV !== 'production') {
-  app.get('/api/debug', (req, res) => {
-    res.json({
-      env: process.env.NODE_ENV,
-      mongodbUri: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
-      jwtSecret: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
-      mongooseState: mongoose.connection.readyState
-    });
-  });
-}
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error'
-  });
-});
-
 // Singleton MongoDB connection pool
 let mongooseConnection = null;
 
@@ -114,6 +81,39 @@ app.use(async (req, res, next) => {
     }
   }
   next();
+});
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/subscription', require('./routes/subscription'));
+app.use('/api/categories', require('./routes/categories'));
+app.use('/api/prompts', require('./routes/prompts'));
+app.use('/api/admin', require('./routes/admin'));
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Debug endpoint (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/api/debug', (req, res) => {
+    res.json({
+      env: process.env.NODE_ENV,
+      mongodbUri: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+      jwtSecret: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+      mongooseState: mongoose.connection.readyState
+    });
+  });
+}
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error'
+  });
 });
 
 // For Vercel: export the app for serverless functions
