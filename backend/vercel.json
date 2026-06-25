@@ -3,7 +3,6 @@
   "buildCommand": "npm install",
   "installCommand": "npm install",
   "framework": "express",
-  "nodeVersion": "20.x",
   "env": {
     "MONGODB_URI": "mongodb+srv://souravsingha502_db_user:Y9TwOpIVPl9eITVI@clusterpromptcraftery.n5mugkr.mongodb.net/?appName=Clusterpromptcraftery",
     "JWT_SECRET": "promptvault_super_secret_jwt_key_change_me_in_production",
