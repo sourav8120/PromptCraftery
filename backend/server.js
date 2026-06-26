@@ -48,19 +48,23 @@ const connectDB = async () => {
   if (mongooseConnection && mongoose.connection.readyState === 1) {
     return mongooseConnection;
   }
-  
+
   try {
     if (!process.env.MONGODB_URI) {
       throw new Error('MONGODB_URI environment variable not set');
     }
-    
+
     mongooseConnection = await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 30000,
+      connectTimeoutMS: 30000,
+      socketTimeoutMS: 60000,
       retryWrites: true,
       maxPoolSize: 1,
+      family: 4,
+      tls: true,
+      bufferCommands: false,
     });
-    
+
     console.log('✅ MongoDB connected to:', mongoose.connection.name);
     return mongooseConnection;
   } catch (err) {
@@ -115,6 +119,12 @@ app.use((err, req, res, next) => {
     error: err.message || 'Internal Server Error'
   });
 });
+
+if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+  connectDB().catch((err) => {
+    console.error('Initial DB warmup failed:', err.message);
+  });
+}
 
 // For Vercel: export the app for serverless functions
 module.exports = app;
