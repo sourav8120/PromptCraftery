@@ -2,6 +2,10 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+console.log('Frontend API_BASE:', API_BASE);
+if (!process.env.REACT_APP_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+  console.warn('REACT_APP_API_URL is not set. Frontend is using localhost fallback in production!', { API_BASE, hostname: window.location.hostname });
+}
 
 const UserContext = createContext();
 
@@ -52,6 +56,10 @@ export function UserProvider({ children }) {
   };
 
   const register = async (name, email, password) => {
+    if (API_BASE.includes('localhost') && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      throw new Error('Frontend API URL not configured. Set REACT_APP_API_URL to your deployed backend.');
+    }
+
     try {
       const res = await api.post('/users/register', { name, email, password });
       localStorage.setItem('pv_token', res.data.token);

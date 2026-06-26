@@ -2,6 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+console.log('Admin API_BASE:', API_BASE);
+if (!process.env.REACT_APP_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+  console.warn('REACT_APP_API_URL is not set. Admin app is using localhost fallback in production!', { API_BASE, hostname: window.location.hostname });
+}
 
 const AuthContext = createContext();
 
