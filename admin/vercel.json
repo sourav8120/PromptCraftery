@@ -4,7 +4,7 @@
   "installCommand": "npm install",
   "outputDirectory": "build",
   "env": {
-    "REACT_APP_API_URL": "https://prompt-craftery-e2pe.vercel.app/api"
+    "REACT_APP_API_URL": "https://prompt-craftery-backend.vercel.app/api"
   },
   "rewrites": [
     {
