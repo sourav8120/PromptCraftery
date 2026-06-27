@@ -1,10 +1,22 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const getApiBase = () => {
+  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:5001/api';
+    if (host.includes('vercel.app')) return 'https://prompt-craftery-backend.vercel.app/api';
+  }
+
+  return 'http://localhost:5001/api';
+};
+
+const API_BASE = getApiBase();
 console.log('Frontend API_BASE:', API_BASE);
-if (!process.env.REACT_APP_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-  console.warn('REACT_APP_API_URL is not set. Frontend is using localhost fallback in production!', { API_BASE, hostname: window.location.hostname });
+if (!process.env.REACT_APP_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  console.warn('Frontend using runtime API fallback', { API_BASE, hostname: window.location.hostname });
 }
 
 const UserContext = createContext();

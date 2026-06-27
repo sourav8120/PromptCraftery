@@ -1,6 +1,18 @@
 import axios from 'axios';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const getApiBase = () => {
+  if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:5001/api';
+    if (host.includes('vercel.app')) return 'https://prompt-craftery-backend.vercel.app/api';
+  }
+
+  return 'http://localhost:5001/api';
+};
+
+const API_BASE = getApiBase();
 
 const api = axios.create({ baseURL: API_BASE });
 
