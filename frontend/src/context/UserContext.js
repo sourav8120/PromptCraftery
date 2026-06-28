@@ -10,7 +10,7 @@ const getApiBase = () => {
     if (host.includes('vercel.app')) return 'https://prompt-craftery-backend.vercel.app/api';
   }
 
-  return 'http://localhost:5001/api';
+  return 'https://prompt-craftery-backend.vercel.app/api';
 };
 
 const API_BASE = getApiBase();
@@ -58,6 +58,7 @@ export function UserProvider({ children }) {
       const config = { headers: { Authorization: `Bearer ${authToken}` } };
       const res = await axios.get(`${API_BASE}/users/me`, config);
       setUser(res.data.user);
+      setToken(authToken);
     } catch (error) {
       localStorage.removeItem('pv_token');
       setToken(null);
@@ -105,12 +106,18 @@ export function UserProvider({ children }) {
     try {
       const res = await api.post('/users/increment-usage');
       if (res.data.canAccess) {
-        setUser(prev => ({
+        setUser(prev => prev ? ({
           ...prev,
-          promptsUsed: res.data.promptsUsed
-        }));
+          promptsUsed: res.data.promptsUsed,
+          promptsLimit: res.data.promptsLimit
+        }) : prev);
         return { success: true, data: res.data };
       } else {
+        setUser(prev => prev ? ({
+          ...prev,
+          promptsUsed: res.data.promptsUsed,
+          promptsLimit: res.data.promptsLimit
+        }) : prev);
         return { success: false, error: res.data.error };
       }
     } catch (error) {
@@ -158,12 +165,12 @@ export function UserProvider({ children }) {
               });
 
               if (verifyRes.data.success) {
-                setUser(prev => ({
+                setUser(prev => prev ? ({
                   ...prev,
                   subscription: verifyRes.data.subscription,
                   promptsLimit: verifyRes.data.promptsLimit,
                   promptsUsed: 0
-                }));
+                }) : prev);
                 resolve({ success: true, data: verifyRes.data });
               }
             } catch (error) {
